@@ -7,6 +7,7 @@ const simpleGit = require('simple-git');
 const csv = require('csv-parser')
 const fs = require('fs');
 const { getMongoClient } = require('./mongodb');
+const { exit } = require('process');
 
 const dir = path.dirname(require.main.filename);
 var rootDir = path.join(dir, '..', '..');
@@ -30,7 +31,7 @@ async function main() {
   console.log(`resourceDate: ${resourceDate} vs ${metaDate}`);
   if (resourceDate == meta?.date) {
     console.log('up to date');
-    //exit(0);
+    exit(0);
   }
 
   const dataUrl = resource['url'];
