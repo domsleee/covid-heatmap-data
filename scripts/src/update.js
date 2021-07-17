@@ -31,7 +31,7 @@ async function main() {
   console.log(`resourceDate: ${resourceDate} vs ${metaDate}`);
   if (resourceDate == meta?.date) {
     console.log('up to date');
-    exit(0);
+    exit(1);
   }
 
   const dataUrl = resource['url'];
