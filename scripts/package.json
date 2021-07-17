@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "axios": "^0.21.1",
+    "csv-parser": "^3.0.0",
+    "mongodb": "^4.0.0",
+    "nodejs-file-downloader": "^4.7.1",
+    "simple-git": "^2.41.1"
+  }
+}
