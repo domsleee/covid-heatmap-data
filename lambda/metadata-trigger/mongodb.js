@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const { exit } = require('process');
 
 const URI_KEY = 'MONGODB_URI';
 const uri = process.env[URI_KEY];

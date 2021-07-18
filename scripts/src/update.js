@@ -1,13 +1,13 @@
 const { Collection } = require('mongodb');
-const DATA_URL = 'https://data.nsw.gov.au/data/api/3/action/package_show?id=aefcde60-3b0c-4bc0-9af1-6fe652944ec2';
-const axios = require('axios');
 const Downloader = require('nodejs-file-downloader');
 const path = require('path');
 const simpleGit = require('simple-git');
 const csv = require('csv-parser')
 const fs = require('fs');
-const { getMongoClient } = require('./mongodb');
 const { exit } = require('process');
+const { getMongoClient } = require('../../lambda/metadata-trigger/mongodb');
+const { checkMetadata, getCaseData, getCaseDate } = require('../../lambda/metadata-trigger/util');
+
 
 const dir = path.dirname(require.main.filename);
 var rootDir = path.join(dir, '..', '..');
@@ -15,7 +15,7 @@ const docsDir = path.join(rootDir, 'docs');
 const casesPath = path.join(docsDir, 'cases.csv');
 
 async function main() {
-  const dataJson = (await axios.get(DATA_URL)).data.result;
+  const dataJson = await getCaseData();
   const client = getMongoClient();
   await client.connect();
 
@@ -24,12 +24,7 @@ async function main() {
   const metadataCollection = await dbo.collection('metadata');
   const meta = await metadataCollection.findOne({});
 
-  const resource = dataJson.resources[0];
-  const resourceDate = resource['created'];
-  const metaDate = meta?.date;
-
-  console.log(`resourceDate: ${resourceDate} vs ${metaDate}`);
-  if (resourceDate == meta?.date) {
+  if (!checkMetadata(dataJson, meta).needsUpdating) {
     console.log('up to date');
     exit(1);
   }
@@ -44,7 +39,7 @@ async function main() {
   await bulkUpdate(dataCollection, entriesToUpdate);
   console.timeEnd('bulkUpdate');
 
-  await updateMetadata(metadataCollection, new Date(resource['created']));
+  await updateMetadata(metadataCollection, getCaseDate(dataJson));
 
   client.close();
 }
