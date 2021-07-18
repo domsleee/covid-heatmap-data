@@ -29,7 +29,7 @@ async function main() {
     exit(1);
   }
 
-  const dataUrl = resource['url'];
+  const dataUrl = dataJson.resources[0]['url'];
   await downloadCsv(dataUrl);
   const keysToRefresh = await getDocs();
   const entries = await readEntriesFromCsv();
